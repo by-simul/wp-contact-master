@@ -2,8 +2,10 @@
 
 class WPCM_Contact_Admin{
     public function init(){
-        add_action('admin_menu', [$this, 'register_menu']);
         add_action('admin_init', [$this, 'register_settings']);
+        add_action('admin_menu', [$this, 'register_menu']);
+        add_action('admin_init', [$this, 'handle_delete']);
+        add_action('admin_init', [$this, 'handle_bulk_delete']);
     }
 
     public function register_settings() {
@@ -68,6 +70,63 @@ class WPCM_Contact_Admin{
     public function render_settings_page(){
         include WPCM_PATH . 'templates/admin-settings.php';
     }
+
+
+    public function handle_delete() {
+
+        if (!isset($_GET['action']) || $_GET['action'] !== 'delete') {
+            return;
+        }
+
+        if (!isset($_GET['id'])) {
+            return;
+        }
+
+        if (!isset($_GET['_wpnonce']) ||
+            !wp_verify_nonce($_GET['_wpnonce'], 'wpcm_delete_message')) {
+            wp_die('Security check failed!');
+        }
+
+        $id = intval($_GET['id']);
+
+        require_once WPCM_PATH . 'includes/class-db.php';
+        $db = new WPCM_Contact_DB();
+        $db->delete_submission($id);
+
+        wp_redirect(admin_url('admin.php?page=wpcm_messages&deleted=1'));
+        exit;
+    }
+
+
+
+    public function handle_bulk_delete() {
+
+        if (!isset($_POST['bulk_delete'])) {
+            return;
+        }
+
+        if (!isset($_POST['wpcm_bulk_delete_nonce']) ||
+            !wp_verify_nonce($_POST['wpcm_bulk_delete_nonce'], 'wpcm_bulk_delete_action')) {
+            wp_die('Security check failed!');
+        }
+
+        if (!isset($_POST['selected_ids']) || empty($_POST['selected_ids'])) {
+            return;
+        }
+
+        $ids = array_map('intval', $_POST['selected_ids']);
+
+        require_once WPCM_PATH . 'includes/class-db.php';
+        $db = new WPCM_Contact_DB();
+
+        foreach ($ids as $id) {
+            $db->delete_submission($id);
+        }
+
+        wp_redirect(admin_url('admin.php?page=wpcm_messages&bulk_deleted=1'));
+        exit;
+    }
+
 
 }
 

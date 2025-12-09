@@ -49,4 +49,17 @@ class WPCM_Contact_DB {
             "SELECT * FROM {$this->table_name} ORDER BY id DESC"
         );
     }
+
+    public function delete_submission($id) {
+        global $wpdb;
+
+        return $wpdb->delete(
+            $this->table_name,
+            ['id' => $id],   // WHERE id = ?
+            ['%d']           // integer format
+        );
+    }
+
+
+    
 }
