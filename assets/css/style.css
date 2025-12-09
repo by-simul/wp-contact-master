@@ -1,0 +1,85 @@
+.wpcm-form-wrapper {
+    max-width: 480px;
+    margin: 40px auto;
+    padding: 24px 24px 28px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.wpcm-form-wrapper h2 {
+    margin-top: 0;
+}
+
+.wpcm-form {
+    margin: 0;
+}
+
+.wpcm-field {
+    margin-bottom: 16px;
+}
+
+.wpcm-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.wpcm-field input,
+.wpcm-field textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.wpcm-field input:focus,
+.wpcm-field textarea:focus {
+    outline: none;
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+}
+
+.wpcm-actions {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.wpcm-btn {
+    border: none;
+    padding: 8px 16px;
+    background: #2271b1;
+    color: #ffffff;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.wpcm-btn:hover {
+    background: #135e96;
+}
+
+.wpcm-notice {
+    margin-bottom: 16px;
+}
+
+.wpcm-success {
+    padding: 8px 12px;
+    background: #e6f7e9;
+    border-left: 4px solid #1a7f37;
+    color: #1a7f37;
+    font-size: 14px;
+}
+
+.wpcm-error {
+    padding: 8px 12px;
+    background: #fdecea;
+    border-left: 4px solid #d63638;
+    color: #d63638;
+    font-size: 14px;
+}
