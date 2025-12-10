@@ -6,6 +6,8 @@ class WPCM_Contact_Admin{
         add_action('admin_menu', [$this, 'register_menu']);
         add_action('admin_init', [$this, 'handle_delete']);
         add_action('admin_init', [$this, 'handle_bulk_delete']);
+        add_action('admin_init', [$this, 'handle_shortcode_create']);
+        add_action('admin_inti', [$this, 'handle_shortcode_update']);
     }
 
     public function register_settings() {
@@ -47,6 +49,15 @@ class WPCM_Contact_Admin{
             'manage_options',                  // Capability
             'wpcm_settings',                   // Unique slug
             [$this, 'render_settings_page']    // Callback
+        );
+
+        add_submenu_page(
+            'wpcm_messages',
+            'Shortcodes',
+            'Shortcodes',
+            'manage_options',
+            'wpcm_shortcodes',
+            [$this, 'render_shortcodes_page']
         );
     }
 
@@ -126,6 +137,94 @@ class WPCM_Contact_Admin{
         wp_redirect(admin_url('admin.php?page=wpcm_messages&bulk_deleted=1'));
         exit;
     }
+
+
+    public function render_shortcodes_page(){
+        include WPCM_PATH . 'templates/admin-shortcodes.php';
+    }
+
+
+
+    public function handle_shortcode_create() {
+
+        // STEP 1: Check if submit button pressed
+        if (!isset($_POST['create_shortcode'])) {
+            return;
+        }
+
+        // STEP 2: Security nonce
+        if (
+            !isset($_POST['wpcm_create_shortcode_nonce']) ||
+            !wp_verify_nonce($_POST['wpcm_create_shortcode_nonce'], 'wpcm_create_shortcode_action')
+        ) {
+            wp_die('Security check failed!');
+        }
+
+        // STEP 3: Read form data
+        $name    = sanitize_text_field($_POST['sc_name']);
+        $fields  = isset($_POST['fields']) ? array_map('sanitize_text_field', $_POST['fields']) : [];
+        $success = sanitize_text_field($_POST['success_message']);
+        $button  = sanitize_text_field($_POST['button_text']);
+
+        // STEP 4: Save to wp_options
+        $shortcodes = get_option('wpcm_custom_shortcodes', []);
+        $id = uniqid('wpcm_');
+
+        $shortcodes[$id] = [
+            'name'   => $name,
+            'fields' => $fields,
+            'success' => $success,
+            'button' => $button
+        ];
+
+        update_option('wpcm_custom_shortcodes', $shortcodes);
+
+        // STEP 5: Redirect with notice
+        wp_redirect(admin_url('admin.php?page=wpcm_shortcodes&created=1'));
+        exit;
+    }
+
+
+    public function handle_shortcode_update() {
+
+    if (!isset($_POST['update_shortcode'])) {
+        return;
+    }
+
+    if (
+        !isset($_POST['wpcm_update_shortcode_nonce']) ||
+        !wp_verify_nonce($_POST['wpcm_update_shortcode_nonce'], 'wpcm_update_shortcode_action')
+    ) {
+        wp_die('Security check failed!');
+    }
+
+    $id      = sanitize_text_field($_POST['sc_id']);
+    $name    = sanitize_text_field($_POST['sc_name']);
+    $fields  = isset($_POST['fields']) ? array_map('sanitize_text_field', $_POST['fields']) : [];
+    $success = sanitize_text_field($_POST['success_message']);
+    $button  = sanitize_text_field($_POST['button_text']);
+
+    $shortcodes = get_option('wpcm_custom_shortcodes', []);
+
+    if (!isset($shortcodes[$id])) {
+        wp_die('Shortcode not found!');
+    }
+
+    // Update
+    $shortcodes[$id] = [
+        'name'    => $name,
+        'fields'  => $fields,
+        'success' => $success,
+        'button'  => $button
+    ];
+
+    update_option('wpcm_custom_shortcodes', $shortcodes);
+
+    wp_redirect(admin_url('admin.php?page=wpcm_shortcodes&updated=1'));
+    exit;
+}
+
+
 
 
 }
